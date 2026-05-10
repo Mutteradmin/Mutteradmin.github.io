@@ -1,0 +1,2412 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 纪元导航者 | AI Chronicle</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;700&family=Orbitron:wght@400;500;700;800;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0b0f19;
+            --bg-card: rgba(18, 24, 40, 0.75);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --primary: #3b82f6;
+            --primary-glow: rgba(59, 130, 246, 0.35);
+            --accent: #06b6d4;
+            --accent2: #8b5cf6;
+            --danger: #ef4444;
+            --danger-hover: #dc2626;
+            --success: #22c55e;
+            --text-main: #e2e8f0;
+            --text-muted: #94a3b8;
+            --radius: 14px;
+            --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Inter', 'Noto Sans SC', sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-main);
+            line-height: 1.7;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 80% 60% at 20% 20%, rgba(59,130,246,0.10) 0%, transparent 60%),
+                radial-gradient(ellipse 60% 50% at 80% 80%, rgba(139,92,246,0.08) 0%, transparent 60%),
+                radial-gradient(ellipse 50% 40% at 50% 50%, rgba(6,182,212,0.05) 0%, transparent 60%);
+            z-index: -2;
+            pointer-events: none;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+            background-size: 50px 50px;
+            z-index: -1;
+            pointer-events: none;
+            mask-image: radial-gradient(circle at center, black 25%, transparent 75%);
+            -webkit-mask-image: radial-gradient(circle at center, black 25%, transparent 75%);
+        }
+
+        /* Nav */
+        nav {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            background: rgba(11, 15, 25, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--glass-border);
+            z-index: 1000;
+            padding: 0 24px;
+        }
+        .nav-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 60px;
+        }
+        .logo {
+            font-size: 1.2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.02em;
+        }
+        .nav-links { display: flex; gap: 6px; }
+        .nav-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+            padding: 8px 14px;
+            border-radius: 8px;
+            transition: var(--transition);
+        }
+        .nav-links a:hover { color: var(--text-main); background: rgba(255,255,255,0.06); }
+
+        /* Hero */
+        /* CRT Scanline overlay */
+        .crt-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 9998;
+            pointer-events: none;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0,0,0,0.07),
+                rgba(0,0,0,0.07) 1px,
+                transparent 1px,
+                transparent 3px
+            );
+            opacity: 0.6;
+        }
+        .crt-vignette {
+            position: fixed;
+            inset: 0;
+            z-index: 9997;
+            pointer-events: none;
+            background: radial-gradient(circle at center, transparent 50%, rgba(0,0,0,0.5) 100%);
+        }
+
+        /* Background Canvas */
+        #bgCanvas {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: -3;
+            pointer-events: none;
+        }
+
+        /* Hero - Cyberpunk Landing */
+        .hero {
+            position: relative;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 100px 24px 80px;
+            overflow: hidden;
+        }
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            max-width: 860px;
+        }
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 20px;
+            border-radius: 4px;
+            background: rgba(6,182,212,0.08);
+            border: 1px solid rgba(6,182,212,0.3);
+            color: #22d3ee;
+            font-family: 'Orbitron', monospace;
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            margin-bottom: 32px;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero-badge::before {
+            content: '';
+            width: 8px; height: 8px;
+            background: #22d3ee;
+            box-shadow: 0 0 12px #22d3ee, 0 0 24px #22d3ee;
+            animation: blink 1.5s step-end infinite;
+            clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+        }
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.2; }
+        }
+        .hero h1 {
+            font-family: 'Orbitron', 'Noto Sans SC', sans-serif;
+            font-size: clamp(2.5rem, 6vw, 4.5rem);
+            font-weight: 900;
+            line-height: 1.1;
+            margin-bottom: 24px;
+            letter-spacing: 0.08em;
+            color: #fff;
+            text-shadow:
+                0 0 10px rgba(59,130,246,0.8),
+                0 0 40px rgba(59,130,246,0.5),
+                0 0 80px rgba(59,130,246,0.3),
+                0 0 120px rgba(139,92,246,0.2);
+            position: relative;
+        }
+        .hero h1::before,
+        .hero h1::after {
+            content: attr(data-text);
+            position: absolute;
+            left: 0; top: 0;
+            width: 100%;
+            color: #fff;
+        }
+        .hero h1::before {
+            left: 2px;
+            text-shadow: -2px 0 #ef4444;
+            clip-path: inset(0 0 0 0);
+            animation: glitch-1 3s infinite step-end;
+        }
+        .hero h1::after {
+            left: -2px;
+            text-shadow: 2px 0 #22d3ee;
+            clip-path: inset(0 0 0 0);
+            animation: glitch-2 2.5s infinite step-end;
+        }
+        @keyframes glitch-1 {
+            0%, 85%, 100% { clip-path: inset(0 0 0 0); transform: translate(0); opacity: 0; }
+            10% { clip-path: inset(10% 0 60% 0); transform: translate(-4px, 0); opacity: 0.85; }
+            15% { clip-path: inset(0 0 0 0); transform: translate(0); opacity: 0; }
+            40% { clip-path: inset(60% 0 15% 0); transform: translate(4px, 0); opacity: 0.85; }
+            45% { clip-path: inset(0 0 0 0); transform: translate(0); opacity: 0; }
+            70% { clip-path: inset(30% 0 40% 0); transform: translate(-3px, 0); opacity: 0.85; }
+            75% { clip-path: inset(0 0 0 0); transform: translate(0); opacity: 0; }
+        }
+        @keyframes glitch-2 {
+            0%, 80%, 100% { clip-path: inset(0 0 0 0); transform: translate(0); opacity: 0; }
+            15% { clip-path: inset(40% 0 30% 0); transform: translate(3px, 0); opacity: 0.85; }
+            20% { clip-path: inset(0 0 0 0); transform: translate(0); opacity: 0; }
+            50% { clip-path: inset(15% 0 70% 0); transform: translate(-3px, 0); opacity: 0.85; }
+            55% { clip-path: inset(0 0 0 0); transform: translate(0); opacity: 0; }
+            65% { clip-path: inset(70% 0 10% 0); transform: translate(5px, 0); opacity: 0.85; }
+            70% { clip-path: inset(0 0 0 0); transform: translate(0); opacity: 0; }
+        }
+        .hero p {
+            font-size: 1.05rem;
+            color: var(--text-muted);
+            max-width: 520px;
+            margin: 0 auto 48px;
+            line-height: 1.9;
+            text-shadow: 0 0 20px rgba(0,0,0,0.8);
+        }
+        .hero-stats {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 52px;
+            flex-wrap: wrap;
+        }
+        .stat-card {
+            background: rgba(11, 15, 25, 0.7);
+            border: 1px solid rgba(6,182,212,0.15);
+            border-radius: 4px;
+            padding: 24px 28px;
+            min-width: 120px;
+            backdrop-filter: blur(12px);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            font-family: 'Share Tech Mono', 'Noto Sans SC', monospace;
+        }
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #22d3ee, transparent);
+            opacity: 0.6;
+        }
+        .stat-card::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, rgba(6,182,212,0.05), transparent 40%);
+            pointer-events: none;
+        }
+        .stat-card:hover {
+            border-color: rgba(6,182,212,0.4);
+            box-shadow: 0 0 30px rgba(6,182,212,0.15), inset 0 0 20px rgba(6,182,212,0.05);
+            transform: translateY(-2px);
+        }
+        .stat-value {
+            font-size: 2.8rem;
+            font-weight: 400;
+            color: #22d3ee;
+            line-height: 1;
+            margin-bottom: 8px;
+            position: relative;
+            z-index: 1;
+            text-shadow: 0 0 10px rgba(6,182,212,0.5);
+        }
+        .stat-label {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Section */
+        section { max-width: 1100px; margin: 0 auto; padding: 50px 24px; }
+        .section-header {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            margin-bottom: 32px;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+        .section-header h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .section-header p { color: var(--text-muted); font-size: 0.9rem; margin-top: 4px; }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 10px;
+            border-radius: 100px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+        .badge-blue { background: rgba(59,130,246,0.14); color: #60a5fa; border: 1px solid rgba(59,130,246,0.2); }
+        .badge-purple { background: rgba(139,92,246,0.14); color: #a78bfa; border: 1px solid rgba(139,92,246,0.2); }
+        .badge-cyan { background: rgba(6,182,212,0.14); color: #22d3ee; border: 1px solid rgba(6,182,212,0.2); }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: var(--transition);
+            font-family: inherit;
+        }
+        .btn-sm { padding: 6px 12px; font-size: 0.8rem; }
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--accent2));
+            color: white;
+            box-shadow: 0 4px 14px rgba(59,130,246,0.3);
+        }
+        .btn-primary:hover { box-shadow: 0 6px 20px rgba(59,130,246,0.45); transform: translateY(-1px); }
+        .btn-secondary {
+            background: rgba(255,255,255,0.06);
+            color: var(--text-main);
+            border: 1px solid var(--glass-border);
+        }
+        .btn-secondary:hover { background: rgba(255,255,255,0.1); }
+        .btn-danger {
+            background: rgba(239,68,68,0.12);
+            color: #f87171;
+            border: 1px solid rgba(239,68,68,0.2);
+        }
+        .btn-danger:hover { background: rgba(239,68,68,0.2); }
+        .btn-text {
+            background: transparent;
+            color: var(--text-muted);
+            padding: 6px;
+        }
+        .btn-text:hover { color: var(--text-main); background: rgba(255,255,255,0.05); }
+        .btn-group { display: flex; gap: 8px; flex-wrap: wrap; }
+
+        /* Timeline */
+        .timeline-toolbar { margin-bottom: 20px; }
+        .timeline-wrapper { position: relative; padding-left: 28px; }
+        .timeline-wrapper::before {
+            content: '';
+            position: absolute;
+            left: 5px;
+            top: 8px;
+            bottom: 8px;
+            width: 2px;
+            background: linear-gradient(180deg, var(--primary), var(--accent2));
+            border-radius: 2px;
+        }
+        .timeline-event {
+            position: relative;
+            margin-bottom: 24px;
+            padding-left: 28px;
+            opacity: 0;
+            transform: translateY(16px);
+            animation: fadeInUp 0.5s ease forwards;
+        }
+        .timeline-event:nth-child(1) { animation-delay: 0.05s; }
+        .timeline-event:nth-child(2) { animation-delay: 0.1s; }
+        .timeline-event:nth-child(3) { animation-delay: 0.15s; }
+        .timeline-dot {
+            position: absolute;
+            left: -28px;
+            top: 6px;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: var(--bg-dark);
+            border: 2.5px solid var(--primary);
+            box-shadow: 0 0 0 3px rgba(59,130,246,0.15), 0 0 16px rgba(59,130,246,0.2);
+        }
+        .timeline-card {
+            background: var(--bg-card);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius);
+            padding: 20px 22px;
+            backdrop-filter: blur(12px);
+            transition: var(--transition);
+            position: relative;
+        }
+        .timeline-card:hover {
+            border-color: rgba(59,130,246,0.25);
+            box-shadow: 0 8px 28px rgba(0,0,0,0.25), 0 0 0 1px rgba(59,130,246,0.08);
+        }
+        .timeline-date { font-size: 0.82rem; font-weight: 600; color: var(--primary); margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
+        .timeline-title { font-size: 1.05rem; font-weight: 600; margin-bottom: 6px; color: #fff; }
+        .timeline-desc { color: var(--text-muted); font-size: 0.88rem; line-height: 1.65; }
+        .timeline-actions {
+            position: absolute;
+            top: 14px;
+            right: 14px;
+            display: flex;
+            gap: 4px;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        .timeline-card:hover .timeline-actions { opacity: 1; }
+
+        /* Achievement Cards */
+        .achievement-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 20px; }
+
+        /* Comparison View */
+        .comparison-tabs {
+            display: flex;
+            align-items: center;
+            gap: 0;
+            overflow-x: auto;
+            padding: 0 0 12px;
+            margin-bottom: 20px;
+            scrollbar-width: thin;
+            position: relative;
+        }
+        .comparison-tabs::after {
+            content: '';
+            position: absolute;
+            bottom: 12px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--primary), var(--accent2), var(--accent));
+            border-radius: 2px;
+            opacity: 0.3;
+        }
+        .comparison-tabs::-webkit-scrollbar { height: 4px; }
+        .comparison-tabs::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
+        .comparison-tab {
+            flex-shrink: 0;
+            padding: 8px 16px;
+            border-radius: 8px 8px 0 0;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid var(--glass-border);
+            border-bottom: none;
+            color: var(--text-muted);
+            font-size: 0.82rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: 'Share Tech Mono', 'Noto Sans SC', monospace;
+            position: relative;
+            z-index: 1;
+        }
+        .comparison-tab:hover {
+            background: rgba(255,255,255,0.08);
+            border-color: rgba(139,92,246,0.3);
+            color: var(--text-main);
+        }
+        .comparison-tab.active {
+            background: rgba(139,92,246,0.15);
+            border-color: rgba(139,92,246,0.4);
+            border-bottom: 2px solid rgba(139,92,246,0.6);
+            color: #a78bfa;
+            box-shadow: 0 0 16px rgba(139,92,246,0.15);
+        }
+        .comparison-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .comparison-card {
+            background: var(--bg-card);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius);
+            padding: 20px;
+            backdrop-filter: blur(12px);
+            transition: var(--transition);
+            width: 100%;
+        }
+        .comparison-card:hover {
+            border-color: rgba(139,92,246,0.25);
+            box-shadow: 0 8px 28px rgba(0,0,0,0.25);
+        }
+        .comparison-card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 14px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--glass-border);
+        }
+        .comparison-card-avatar {
+            width: 36px; height: 36px; border-radius: 8px;
+            background: linear-gradient(135deg, var(--accent2), var(--primary));
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.85rem; font-weight: 700; color: white; flex-shrink: 0;
+            overflow: hidden;
+        }
+        .comparison-card-avatar img {
+            width: 100%; height: 100%; object-fit: contain; padding: 2px; background: white;
+        }
+        .comparison-card-name {
+            font-size: 0.95rem;
+            font-weight: 600;
+        }
+        .comparison-card-body {
+            font-size: 0.86rem;
+            color: var(--text-muted);
+            line-height: 1.75;
+        }
+        .comparison-empty {
+            text-align: center;
+            padding: 32px;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            border: 1px dashed var(--glass-border);
+            border-radius: var(--radius);
+            background: rgba(255,255,255,0.02);
+        }
+        .comparison-hint {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            padding: 40px;
+        }
+
+        .company-card {
+            background: var(--bg-card);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius);
+            overflow: hidden;
+            backdrop-filter: blur(12px);
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+        }
+        .company-card:hover { border-color: rgba(139,92,246,0.25); box-shadow: 0 8px 28px rgba(0,0,0,0.25); }
+        .company-header {
+            padding: 18px 20px 14px;
+            border-bottom: 1px solid var(--glass-border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+        .company-header-left { display: flex; align-items: center; gap: 12px; min-width: 0; }
+        .company-avatar {
+            width: 40px; height: 40px; border-radius: 10px;
+            background: linear-gradient(135deg, var(--accent2), var(--primary));
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1rem; font-weight: 700; color: white; flex-shrink: 0;
+            overflow: hidden;
+        }
+        .company-avatar img {
+            width: 100%; height: 100%;
+            object-fit: contain;
+            padding: 3px;
+            background: white;
+        }
+        .company-name { font-size: 1rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .company-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 26px; height: 26px;
+            border-radius: 6px;
+            background: rgba(6,182,212,0.12);
+            color: var(--accent);
+            text-decoration: none;
+            font-size: 0.85rem;
+            flex-shrink: 0;
+            transition: var(--transition);
+            border: 1px solid rgba(6,182,212,0.2);
+        }
+        .company-link:hover {
+            background: rgba(6,182,212,0.25);
+            transform: translateY(-1px);
+        }
+        .company-actions { display: flex; gap: 4px; flex-shrink: 0; }
+
+        .company-toolbar {
+            padding: 10px 20px;
+            border-bottom: 1px solid var(--glass-border);
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        /* Accordion Year Segments */
+        .year-list { display: flex; flex-direction: column; }
+        .year-group {
+            border-bottom: 1px solid var(--glass-border);
+        }
+        .year-group:last-child { border-bottom: none; }
+        .year-group-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            cursor: pointer;
+            transition: background 0.2s;
+            gap: 12px;
+            background: rgba(255,255,255,0.02);
+        }
+        .year-group-header:hover { background: rgba(255,255,255,0.05); }
+        .year-group-header-left { display: flex; align-items: center; gap: 10px; min-width: 0; flex: 1; }
+        .year-group-chevron {
+            width: 20px; height: 20px;
+            display: flex; align-items: center; justify-content: center;
+            color: var(--primary);
+            transition: transform 0.25s;
+            flex-shrink: 0;
+            font-size: 0.9rem;
+        }
+        .year-group.open .year-group-chevron { transform: rotate(90deg); }
+        .year-group-label {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #fff;
+        }
+        .year-group-count {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            flex-shrink: 0;
+        }
+        .year-group-body {
+            display: grid;
+            grid-template-rows: 0fr;
+            transition: grid-template-rows 0.35s ease;
+        }
+        .year-group.open .year-group-body { grid-template-rows: 1fr; }
+        .year-group-body > .year-list-inner { overflow: hidden; min-height: 0; }
+        .year-list-inner { display: flex; flex-direction: column; }
+        .year-list-inner .year-item {
+            border-bottom: 1px solid var(--glass-border);
+            border-left: 2px solid rgba(59,130,246,0.12);
+            margin-left: 16px;
+        }
+        .year-list-inner .year-item:last-child { border-bottom: none; }
+        .year-item {
+            border-bottom: 1px solid var(--glass-border);
+        }
+        .year-item:last-child { border-bottom: none; }
+        .year-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 20px;
+            cursor: pointer;
+            transition: background 0.2s;
+            gap: 12px;
+        }
+        .year-header:hover { background: rgba(255,255,255,0.03); }
+        .year-header-left { display: flex; align-items: center; gap: 10px; min-width: 0; flex: 1; }
+        .year-chevron {
+            width: 20px; height: 20px;
+            display: flex; align-items: center; justify-content: center;
+            color: var(--text-muted);
+            transition: transform 0.25s;
+            flex-shrink: 0;
+        }
+        .year-item.open .year-chevron { transform: rotate(90deg); color: var(--accent); }
+        .year-label {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--accent);
+            flex-shrink: 0;
+            min-width: 52px;
+        }
+        .year-preview {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            flex: 1;
+        }
+        .year-actions {
+            display: flex;
+            gap: 2px;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        .year-header:hover .year-actions { opacity: 1; }
+
+        .year-body {
+            display: grid;
+            grid-template-rows: 0fr;
+            transition: grid-template-rows 0.35s ease;
+        }
+        .year-body > .year-text {
+            overflow: hidden;
+            min-height: 0;
+        }
+        .year-item.open .year-body {
+            grid-template-rows: 1fr;
+        }
+        .year-text {
+            font-size: 0.86rem;
+            color: var(--text-muted);
+            line-height: 1.75;
+            padding: 0 20px 16px 56px;
+        }
+
+        /* Links */
+        .links-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+        .link-card {
+            background: var(--bg-card);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius);
+            padding: 20px;
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            transition: var(--transition);
+            backdrop-filter: blur(12px);
+        }
+        .link-card:hover { border-color: rgba(6,182,212,0.25); transform: translateY(-2px); box-shadow: 0 8px 28px rgba(0,0,0,0.2); }
+        .link-card h3 { font-size: 1rem; color: #fff; display: flex; align-items: center; gap: 8px; }
+        .link-card p { font-size: 0.82rem; color: var(--text-muted); line-height: 1.55; }
+        .link-arrow { margin-left: auto; color: var(--accent); font-size: 1.1rem; transition: transform 0.2s; }
+        .link-card:hover .link-arrow { transform: translateX(3px); }
+
+        /* Data section */
+        .data-card {
+            background: var(--bg-card);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius);
+            padding: 24px;
+            backdrop-filter: blur(12px);
+        }
+
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.65);
+            backdrop-filter: blur(10px);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .modal-overlay.active { display: flex; }
+        .modal-box {
+            background: #131a2b;
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius);
+            padding: 28px;
+            max-width: 520px;
+            width: 100%;
+            box-shadow: 0 24px 64px rgba(0,0,0,0.5);
+            position: relative;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .modal-box h3 { margin-bottom: 20px; font-size: 1.15rem; }
+        .modal-close {
+            position: absolute;
+            top: 14px; right: 18px;
+            background: none; border: none;
+            color: var(--text-muted);
+            font-size: 1.4rem;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        .modal-close:hover { color: #fff; }
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; font-size: 0.82rem; font-weight: 500; margin-bottom: 6px; color: var(--text-muted); }
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px 14px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            color: var(--text-main);
+            font-family: inherit;
+            font-size: 0.9rem;
+            transition: var(--transition);
+        }
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(59,130,246,0.12);
+        }
+        .form-group textarea { resize: vertical; min-height: 100px; }
+        .form-group textarea.large { min-height: 220px; }
+        .form-hint { font-size: 0.78rem; color: var(--text-muted); margin-top: 6px; }
+
+        /* Tag System */
+        .tag-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 0.04em;
+            margin-right: 5px;
+            margin-bottom: 3px;
+            line-height: 1.6;
+        }
+        .tag-list { display: inline-flex; flex-wrap: wrap; gap: 3px; align-items: center; }
+        .tag-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.78rem;
+            font-weight: 500;
+            cursor: pointer;
+            border: 1.5px solid rgba(255,255,255,0.12);
+            background: rgba(255,255,255,0.03);
+            color: var(--text-muted);
+            transition: var(--transition);
+            user-select: none;
+            white-space: nowrap;
+        }
+        .tag-chip:hover { border-color: rgba(255,255,255,0.25); color: var(--text-main); }
+        .tag-chip.active {
+            border-color: var(--chip-color, var(--primary));
+            background: color-mix(in srgb, var(--chip-color, var(--primary)) 18%, transparent);
+            color: var(--chip-color, var(--primary));
+            box-shadow: 0 0 10px color-mix(in srgb, var(--chip-color, var(--primary)) 25%, transparent);
+        }
+        .tag-filter-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 16px;
+            align-items: center;
+        }
+        .tag-filter-label {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            margin-right: 4px;
+            flex-shrink: 0;
+        }
+        .tag-clear-filter {
+            font-size: 0.75rem;
+            color: var(--danger);
+            cursor: pointer;
+            padding: 4px 10px;
+            border-radius: 6px;
+            background: rgba(239,68,68,0.08);
+            border: 1px solid rgba(239,68,68,0.15);
+            transition: var(--transition);
+            white-space: nowrap;
+            margin-left: 4px;
+        }
+        .tag-clear-filter:hover { background: rgba(239,68,68,0.18); }
+        .tag-picker {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            padding: 8px 0;
+        }
+
+        /* Search */
+        .search-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+        .search-input {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            padding: 7px 34px 7px 34px;
+            color: var(--text-main);
+            font-family: inherit;
+            font-size: 0.83rem;
+            width: 200px;
+            transition: var(--transition);
+            outline: none;
+        }
+        .search-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(59,130,246,0.12);
+            width: 260px;
+        }
+        .search-input::placeholder { color: var(--text-muted); font-size: 0.8rem; }
+        .search-icon {
+            position: absolute;
+            left: 10px;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            pointer-events: none;
+            transition: color 0.2s;
+        }
+        .search-container:focus-within .search-icon { color: var(--primary); }
+        .search-clear {
+            position: absolute;
+            right: 6px;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 1rem;
+            padding: 2px 5px;
+            border-radius: 4px;
+            display: none;
+            transition: var(--transition);
+            line-height: 1;
+        }
+        .search-clear:hover { color: var(--text-main); background: rgba(255,255,255,0.08); }
+        .search-clear.visible { display: block; }
+        .search-kbd {
+            font-size: 0.65rem;
+            padding: 2px 5px;
+            border-radius: 3px;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid var(--glass-border);
+            color: var(--text-muted);
+            font-family: 'Share Tech Mono', monospace;
+            margin-left: 6px;
+        }
+        .result-indicator {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            margin-left: 10px;
+            flex-shrink: 0;
+        }
+        .result-indicator mark {
+            background: rgba(59,130,246,0.2);
+            color: #60a5fa;
+            padding: 0 4px;
+            border-radius: 3px;
+        }
+        .search-highlight {
+            background: rgba(59,130,246,0.25);
+            color: #93c5fd;
+            padding: 0 2px;
+            border-radius: 2px;
+        }
+
+        @media (max-width: 768px) {
+            .search-input { width: 140px; }
+            .search-input:focus { width: 170px; }
+        }
+
+        /* News Ticker */
+        .news-ticker-wrapper {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+        .news-ticker {
+            background: var(--bg-card);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius);
+            padding: 12px 20px;
+            backdrop-filter: blur(12px);
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            gap: 0;
+        }
+        .news-ticker-label {
+            flex-shrink: 0;
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding-right: 14px;
+            border-right: 1px solid var(--glass-border);
+            margin-right: 14px;
+            white-space: nowrap;
+            z-index: 2;
+            background: var(--bg-card);
+        }
+        .news-ticker-track {
+            flex: 1;
+            overflow: hidden;
+            position: relative;
+            height: 24px;
+        }
+        .news-ticker-text {
+            display: inline-block;
+            white-space: nowrap;
+            font-size: 0.84rem;
+            color: var(--text-main);
+            position: relative;
+            will-change: transform;
+        }
+        .news-ticker-empty {
+            font-size: 0.84rem;
+            color: var(--text-muted);
+            white-space: nowrap;
+            position: relative;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 40px 24px;
+            color: var(--text-muted);
+            font-size: 0.82rem;
+            border-top: 1px solid var(--glass-border);
+            margin-top: 20px;
+        }
+
+        /* Animations */
+        @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 7px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+            .hero-stats { gap: 24px; }
+            .achievement-grid { grid-template-columns: 1fr; }
+            .timeline-actions, .year-actions { opacity: 1 !important; }
+            section { padding: 40px 16px; }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-muted);
+            grid-column: 1 / -1;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="nav-inner">
+            <div class="logo">🧠 AI Chronicle</div>
+            <div class="search-container">
+                <span class="search-icon">🔍</span>
+                <input type="text" class="search-input" id="searchInput" placeholder="搜索...">
+                <button class="search-clear" id="searchClear" onclick="clearSearch()">✕</button>
+            </div>
+            <div class="nav-links">
+                <a href="#timeline">时间轴</a>
+                <a href="#achievements">成就</a>
+                <a href="#links">资源</a>
+                <a href="#data">数据</a>
+            </div>
+        </div>
+    </nav>
+
+    <canvas id="bgCanvas"></canvas>
+    <div class="crt-overlay"></div>
+    <div class="crt-vignette"></div>
+
+    <section class="hero">
+        <div class="hero-content">
+            <div class="hero-badge">AI Chronicle</div>
+            <h1 data-text="AI 纪元导航者">AI 纪元导航者</h1>
+            <p>在人工智能重塑世界的浪潮中，回溯技术进化枝蔓，透视产业竞合轨迹。</p>
+            <div class="hero-stats">
+                <div class="stat-card">
+                    <div class="stat-value" id="stat-events">0</div>
+                    <div class="stat-label">时间轴事件</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="stat-companies">0</div>
+                    <div class="stat-label">公司成就</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="stat-years">0</div>
+                    <div class="stat-label">涵盖年份</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- News Ticker -->
+    <div class="news-ticker-wrapper">
+        <div class="news-ticker">
+            <span class="news-ticker-label">📢 AI 最新资讯：</span>
+            <div class="news-ticker-track">
+                <span class="news-ticker-text" id="newsTickerText">暂无最近事件</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Data -->
+    <section id="data">
+        <div class="section-header">
+            <div>
+                <h2><span class="badge badge-blue">Data</span> 数据管理</h2>
+                <p>导入/导出本地 JSON 数据</p>
+            </div>
+        </div>
+        <div class="data-card">
+            <p style="color: var(--text-muted); font-size: 0.88rem; margin-bottom: 14px;">
+                你可以将 <code>local_storage_data.json</code> 导入，数据会自动解析并渲染。所有修改也会自动保存到浏览器本地存储。
+            </p>
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="document.getElementById('fileInput').click()">📥 导入 JSON</button>
+                <button class="btn btn-secondary" onclick="exportData()">📤 导出数据</button>
+                <button class="btn btn-danger" onclick="clearAllData()">🗑️ 清空本地数据</button>
+            </div>
+            <input type="file" id="fileInput" accept=".json" style="display:none" onchange="importData(this)">
+        </div>
+    </section>
+
+    <!-- Timeline -->
+    <section id="timeline">
+        <div class="section-header">
+            <div>
+                <h2><span class="badge badge-blue">Timeline</span> 时间轴事件 <span id="timeline-result-indicator" class="result-indicator"></span></h2>
+                <p>记录人工智能发展的关键节点</p>
+            </div>
+            <button class="btn btn-primary btn-sm" onclick="openEventModal()">➕ 添加事件</button>
+        </div>
+        <div id="timeline-tag-filter" class="tag-filter-bar"></div>
+        <div class="timeline-wrapper" id="timeline-container"></div>
+    </section>
+
+    <!-- Achievements -->
+    <section id="achievements">
+        <div class="section-header" id="achievements-header">
+            <div>
+                <h2><span class="badge badge-purple">Achievements</span> 公司成就 <span id="achievements-result-indicator" class="result-indicator"></span></h2>
+                <p>各大公司与研究机构在AI领域的重大突破</p>
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-primary btn-sm" onclick="openCompanyModal()">➕ 添加公司</button>
+                <button class="btn btn-secondary btn-sm" onclick="switchToComparison()">📊 同期比较</button>
+            </div>
+        </div>
+        <div id="achievements-tag-filter" class="tag-filter-bar"></div>
+        <div class="achievement-grid" id="achievements-container"></div>
+    </section>
+
+    <!-- Links -->
+    <section id="links">
+        <div class="section-header">
+            <div>
+                <h2><span class="badge badge-cyan">Resources</span> 相关资源</h2>
+                <p>值得收藏的人工智能资讯与评测平台</p>
+            </div>
+        </div>
+        <div class="links-grid">
+            <a class="link-card" href="https://lmarena.ai/" target="_blank" rel="noopener">
+                <h3>🏆 Chatbot Arena <span class="link-arrow">→</span></h3>
+                <p>由UC Berkeley等高校联合开发的大模型竞技场，通过人类偏好评估LLM真实表现。</p>
+            </a>
+            <a class="link-card" href="https://www.aibase.com/zh/daily" target="_blank" rel="noopener">
+                <h3>📰 AIbase 日报 <span class="link-arrow">→</span></h3>
+                <p>聚焦人工智能领域的资讯聚合平台，每日精选全球AI技术突破与行业动态。</p>
+            </a>
+            <a class="link-card" href="https://arxiv.org/list/cs.AI/recent" target="_blank" rel="noopener">
+                <h3>📄 arXiv AI <span class="link-arrow">→</span></h3>
+                <p>预印本论文库人工智能板块，获取全球最前沿的AI学术研究进展。</p>
+            </a>
+            <a class="link-card" href="https://huggingface.co/" target="_blank" rel="noopener">
+                <h3>🤗 Hugging Face <span class="link-arrow">→</span></h3>
+                <p>机器学习社区与模型托管平台，汇聚了数以万计的开源模型与数据集。</p>
+            </a>
+            <a class="link-card" href="https://relaypulse.top/" target="_blank" rel="noopener">
+                <h3>✈️ RelayPulse 中转站汇聚 <span class="link-arrow">→</span></h3>
+                <p>RelayPulse 是一个API中转站，汇聚了各处的国外API中转服务并实时检测服务质量。</p>
+            </a>
+            <a class="link-card" href="https://cloud.siliconflow.cn/me/models" target="_blank" rel="noopener">
+                <h3>🍽️ 硅基流动 模型服务平台 <span class="link-arrow">→</span></h3>
+                <p>硅基流动 是一个模型服务平台，提供开箱即用的大模型 API 覆盖语言、语音、图片、视频等场景，一站式提供大模型 API 服务，按量计费。</p>
+            </a>
+        </div>
+    </section>
+
+    <footer>
+        <p>© 2024-2025 AI Chronicle. All rights reserved.</p>
+    </footer>
+
+    <!-- Event Modal (Add/Edit) -->
+    <div class="modal-overlay" id="eventModal">
+        <div class="modal-box">
+            <button class="modal-close" onclick="closeModal('eventModal')">&times;</button>
+            <h3 id="eventModalTitle">添加时间轴事件</h3>
+            <input type="hidden" id="eventEditIndex" value="-1">
+            <div class="form-group">
+                <label>日期</label>
+                <input type="date" id="evtDate">
+            </div>
+            <div class="form-group">
+                <label>标题</label>
+                <input type="text" id="evtTitle" placeholder="例如：GPT-4 发布">
+            </div>
+            <div class="form-group">
+                <label>描述</label>
+                <textarea id="evtDesc" placeholder="事件详细描述..."></textarea>
+            </div>
+            <div class="form-group">
+                <label>标签</label>
+                <div class="tag-picker" id="evtTagPicker"></div>
+            </div>
+            <div class="btn-group" style="margin-top: 8px;">
+                <button class="btn btn-primary" onclick="saveEvent()">保存</button>
+                <button class="btn btn-secondary" onclick="closeModal('eventModal')">取消</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Company Modal (Add/Edit) -->
+    <div class="modal-overlay" id="companyModal">
+        <div class="modal-box">
+            <button class="modal-close" onclick="closeModal('companyModal')">&times;</button>
+            <h3 id="companyModalTitle">添加公司成就</h3>
+            <input type="hidden" id="companyEditIndex" value="-1">
+            <div class="form-group">
+                <label>公司名称</label>
+                <input type="text" id="compName" placeholder="例如：OpenAI">
+            </div>
+            <div class="form-group">
+                <label>成就描述</label>
+                <textarea class="large" id="compDesc" placeholder="按年份分行描述，例如：&#10;2023年：发布GPT-4...&#10;2024年：发布GPT-4o..."></textarea>
+                <div class="form-hint">建议按年份分段书写，每段以「年份年：」开头，方便自动折叠展示。</div>
+            </div>
+            <div class="form-group">
+                <label>Logo 链接（可选）</label>
+                <input type="text" id="compLogo" placeholder="例如：https://example.com/logo.png">
+                <div class="form-hint">留空则自动使用字母缩写或内置 Logo 匹配。</div>
+            </div>
+            <div class="form-group">
+                <label>官网 / AI 使用地址（可选）</label>
+                <input type="text" id="compWebsite" placeholder="例如：https://gemini.google.com">
+                <div class="form-hint">填写后会在公司名旁显示 🔗 按钮，点击即可直接打开。</div>
+            </div>
+            <div class="form-hint" style="margin-bottom: 8px;">💡 标签请在具体时间条目上添加，使用格式：<code>2025年 [#大模型] [#开源]：描述内容</code></div>
+            <div class="btn-group" style="margin-top: 8px;">
+                <button class="btn btn-primary" onclick="saveCompany()">保存</button>
+                <button class="btn btn-secondary" onclick="closeModal('companyModal')">取消</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Segment Edit Modal -->
+    <div class="modal-overlay" id="segmentModal">
+        <div class="modal-box">
+            <button class="modal-close" onclick="closeModal('segmentModal')">&times;</button>
+            <h3 id="segmentModalTitle">编辑段落</h3>
+            <input type="hidden" id="segmentCompIdx" value="-1">
+            <input type="hidden" id="segmentSegIdx" value="-1">
+            <div class="form-group">
+                <label>时间标签</label>
+                <input type="text" id="segmentLabel" readonly style="opacity: 0.6;">
+            </div>
+            <div class="form-group">
+                <label>标签</label>
+                <div class="tag-picker" id="segTagPicker"></div>
+            </div>
+            <div class="form-group">
+                <label>内容</label>
+                <textarea class="large" id="segmentText"></textarea>
+            </div>
+            <div class="btn-group" style="margin-top: 8px;">
+                <button class="btn btn-primary" onclick="saveSegment()">保存</button>
+                <button class="btn btn-secondary" onclick="closeModal('segmentModal')">取消</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==================== State ====================
+        let timelineEvents = [];
+        let achievements = [];
+
+        const LOGO_MAP = {
+            'Google DeepMind': 'https://www.google.com/s2/favicons?domain=deepmind.google&sz=128',
+            'DeepMind': 'https://www.google.com/s2/favicons?domain=deepmind.google&sz=128',
+            'OpenAI': 'https://www.google.com/s2/favicons?domain=openai.com&sz=128',
+            'Anthropic': 'https://www.google.com/s2/favicons?domain=anthropic.com&sz=128',
+            'Meta': 'https://www.google.com/s2/favicons?domain=meta.com&sz=128',
+            'Microsoft': 'https://www.google.com/s2/favicons?domain=microsoft.com&sz=128',
+            'NVIDIA': 'https://www.google.com/s2/favicons?domain=nvidia.com&sz=128',
+            '字节跳动': 'https://www.google.com/s2/favicons?domain=bytedance.com&sz=128',
+            '火山引擎': 'https://www.google.com/s2/favicons?domain=volcengine.com&sz=128',
+            '百度': 'https://www.google.com/s2/favicons?domain=baidu.com&sz=128',
+            '阿里巴巴': 'https://www.google.com/s2/favicons?domain=alibaba.com&sz=128',
+            '阿里': 'https://www.google.com/s2/favicons?domain=alibaba.com&sz=128',
+            '腾讯': 'https://www.google.com/s2/favicons?domain=tencent.com&sz=128',
+            'Amazon': 'https://www.google.com/s2/favicons?domain=amazon.com&sz=128',
+            'Apple': 'https://www.google.com/s2/favicons?domain=apple.com&sz=128',
+            'xAI': 'https://www.google.com/s2/favicons?domain=x.ai&sz=128',
+        };
+
+        function getLogoUrl(achievement) {
+            if (achievement.logoUrl) return achievement.logoUrl;
+            const name = achievement.companyName;
+            for (let key in LOGO_MAP) {
+                if (name.toLowerCase().includes(key.toLowerCase())) return LOGO_MAP[key];
+            }
+            return null;
+        }
+
+        // ==================== Tag System ====================
+        const TAG_COLORS = {
+            '大模型': '#3b82f6',
+            '芯片': '#22c55e',
+            '政策': '#f59e0b',
+            '开源': '#06b6d4',
+            '融资': '#8b5cf6',
+            '多模态': '#ec4899',
+            'Agent': '#f97316',
+            '端侧/小模型': '#f97316',
+            '行业垂直应用': '#22c55e',
+            '语音/音频/交互': '#f97316',
+            '评测benchmark': '#78716c',
+            '机器人': '#84cc16',
+            '图像生成': '#dc2626',
+            '视频生成': '#ef4444',
+            '学术': '#6366f1',
+            '产品发布': '#14b8a6',
+            '安全': '#dc2626',
+            '基础设施': '#78716c',
+        };
+        const TAG_NAMES = Object.keys(TAG_COLORS);
+
+        let activeTagFilters = [];  // currently active tag filters (timeline & achievements share)
+
+        function getTagColor(tag) { return TAG_COLORS[tag] || '#6b7280'; }
+
+        function renderTagBadges(tags) {
+            if (!tags || !tags.length) return '';
+            return `<span class="tag-list">${tags.map(t => {
+                const color = getTagColor(t);
+                return `<span class="tag-badge" style="background:color-mix(in srgb,${color} 18%,transparent);border:1px solid color-mix(in srgb,${color} 35%,transparent);color:${color}">${esc(t)}</span>`;
+            }).join('')}</span>`;
+        }
+
+        function renderTagChips(selectedTags, chipClass) {
+            return TAG_NAMES.map(t => {
+                const color = getTagColor(t);
+                const active = selectedTags.includes(t) ? ' active' : '';
+                const style = `--chip-color:${color}`;
+                return `<span class="tag-chip ${chipClass}${active}" style="${style}" data-tag="${esc(t)}" onclick="toggleTagChip(this)">${esc(t)}</span>`;
+            }).join('');
+        }
+
+        function toggleTagChip(chip) {
+            chip.classList.toggle('active');
+        }
+
+        function getSelectedTagsFromChips(container) {
+            const tags = [];
+            container.querySelectorAll('.tag-chip.active').forEach(c => tags.push(c.dataset.tag));
+            return tags;
+        }
+
+        function serializeTags(tags) { return tags.join(','); }
+        function deserializeTags(str) { return str ? str.split(',').map(s => s.trim()).filter(Boolean) : []; }
+
+        // ==================== Search ====================
+        let searchQuery = '';
+
+        function highlightMatches(text, query) {
+            if (!query || !text) return esc(text);
+            const escaped = esc(text);
+            const q = esc(query);
+            const regex = new RegExp(`(${q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+            return escaped.replace(regex, '<mark class="search-highlight">$1</mark>');
+        }
+
+        function performSearch() {
+            const input = document.getElementById('searchInput');
+            const clearBtn = document.getElementById('searchClear');
+            searchQuery = input.value.trim();
+            if (searchQuery) {
+                clearBtn.classList.add('visible');
+            } else {
+                clearBtn.classList.remove('visible');
+            }
+            renderTimeline();
+            if (viewMode === 'comparison') {
+                renderComparisonView();
+            } else {
+                renderAchievements();
+            }
+            updateStats();
+        }
+
+        function clearSearch() {
+            const input = document.getElementById('searchInput');
+            const clearBtn = document.getElementById('searchClear');
+            input.value = '';
+            searchQuery = '';
+            clearBtn.classList.remove('visible');
+            renderTimeline();
+            if (viewMode === 'comparison') {
+                renderComparisonView();
+            } else {
+                renderAchievements();
+            }
+            updateStats();
+        }
+
+        function applyTagFilters() {
+            const activeChips = document.querySelectorAll('#timeline-tag-filter .tl-chip.active, #achievements-tag-filter .ach-chip.active');
+            activeTagFilters = Array.from(activeChips).map(c => c.dataset.tag);
+            // Sync chips between both filter bars
+            document.querySelectorAll('#timeline-tag-filter .tl-chip, #achievements-tag-filter .ach-chip').forEach(chip => {
+                if (activeTagFilters.includes(chip.dataset.tag)) {
+                    chip.classList.add('active');
+                } else {
+                    chip.classList.remove('active');
+                }
+            });
+            renderTimeline();
+            if (viewMode === 'comparison') {
+                currentComparisonLabel = '';
+                renderComparisonView();
+            } else {
+                renderAchievements();
+            }
+            updateStats();
+        }
+
+        function clearTagFilters() {
+            activeTagFilters = [];
+            document.querySelectorAll('#timeline-tag-filter .tl-chip.active, #achievements-tag-filter .ach-chip.active').forEach(c => c.classList.remove('active'));
+            renderTimeline();
+            if (viewMode === 'comparison') {
+                currentComparisonLabel = '';
+                renderComparisonView();
+            } else {
+                renderAchievements();
+            }
+            updateStats();
+        }
+
+        // ==================== News Ticker ====================
+        let tickerX = 0;
+        let tickerActive = false;
+        const TICKER_SPEED = 50; // px/s JS-driven constant speed
+
+        function recordTickerEntry(text) {
+            localStorage.setItem('lastTickerText', text);
+            tickerX = 0; // reset position for new text
+            renderNewsTicker();
+        }
+
+        function tickerAnimationLoop() {
+            const el = document.getElementById('newsTickerText');
+            if (!el || !tickerActive) return;
+            const track = el.parentNode;
+            if (!track) return;
+            const trackW = track.offsetWidth;
+            const textW = el.offsetWidth;
+            if (!textW) { requestAnimationFrame(tickerAnimationLoop); return; }
+            // move left at constant px/s, accounting for frame time
+            tickerX -= TICKER_SPEED / 60;
+            // wrap: when fully off-screen left, reset to right edge
+            if (tickerX < -textW) {
+                tickerX = trackW;
+                // re-measure text (may have changed on next render)
+            }
+            el.style.transform = `translateX(${tickerX}px)`;
+            requestAnimationFrame(tickerAnimationLoop);
+        }
+
+        function startTickerAnimation() {
+            tickerActive = true;
+            tickerAnimationLoop();
+        }
+
+        function stopTickerAnimation() {
+            tickerActive = false;
+        }
+
+        function renderNewsTicker() {
+            const el = document.getElementById('newsTickerText');
+            if (!el) return;
+            const text = localStorage.getItem('lastTickerText');
+            if (text) {
+                tickerActive = false;
+                el.textContent = text;
+                el.style.color = '#fde047';
+                el.style.fontWeight = '700';
+                el.style.textShadow = '0 0 10px rgba(253,224,71,0.35)';
+                el.style.transform = '';
+                el.classList.remove('news-ticker-empty');
+                // Wait one frame for browser to layout, then start
+                requestAnimationFrame(() => {
+                    tickerX = el.parentNode ? el.parentNode.offsetWidth : 0;
+                    startTickerAnimation();
+                });
+            } else {
+                stopTickerAnimation();
+                el.textContent = '暂无最近事件';
+                el.style.color = '';
+                el.style.fontWeight = '';
+                el.style.textShadow = '';
+                el.style.transform = '';
+                el.classList.add('news-ticker-empty');
+            }
+        }
+
+        // ==================== Init ====================
+        function init() {
+            const lsEvents = localStorage.getItem('timelineEvents');
+            const lsAchieve = localStorage.getItem('achievements');
+
+            if (lsEvents) {
+                try { timelineEvents = JSON.parse(lsEvents); } catch(e) {}
+            } else {
+                timelineEvents = [];
+            }
+
+            if (lsAchieve) {
+                try { achievements = JSON.parse(lsAchieve); } catch(e) {}
+            } else {
+                achievements = [];
+            }
+
+            renderTimeline();
+            renderAchievements();
+            updateStats();
+            renderNewsTicker();
+
+            // Search input listener
+            const searchInput = document.getElementById('searchInput');
+            let searchTimer;
+            searchInput.addEventListener('input', () => {
+                clearTimeout(searchTimer);
+                searchTimer = setTimeout(performSearch, 150);
+            });
+            // Clear search on Esc
+            searchInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    clearSearch();
+                    searchInput.blur();
+                }
+            });
+
+            // Keyboard shortcut: Ctrl+K or / to focus search
+            document.addEventListener('keydown', (e) => {
+                if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.isContentEditable) return;
+                if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+                    e.preventDefault();
+                    searchInput.focus();
+                    searchInput.select();
+                } else if (e.key === '/' && !e.ctrlKey && !e.metaKey) {
+                    e.preventDefault();
+                    searchInput.focus();
+                    searchInput.select();
+                }
+            });
+        }
+
+        function persist() {
+            localStorage.setItem('timelineEvents', JSON.stringify(timelineEvents));
+            localStorage.setItem('achievements', JSON.stringify(achievements));
+        }
+
+        // ==================== Timeline ====================
+        function renderTimeline() {
+            const container = document.getElementById('timeline-container');
+            const filterBar = document.getElementById('timeline-tag-filter');
+            const resultIndicator = document.getElementById('timeline-result-indicator');
+
+            // Render tag filter bar
+            if (timelineEvents.length > 0) {
+                filterBar.innerHTML = `
+                    <span class="tag-filter-label">🏷️ 筛选：</span>
+                    ${renderTagChips(activeTagFilters, 'tl-chip')}
+                    ${activeTagFilters.length > 0 ? `<span class="tag-clear-filter" onclick="clearTagFilters()">✕ 清除筛选</span>` : ''}
+                `;
+                // Wire up tag filter chip clicks differently (update global filter)
+                filterBar.querySelectorAll('.tl-chip').forEach(chip => {
+                    chip.addEventListener('click', function() {
+                        applyTagFilters();
+                    });
+                });
+            } else {
+                filterBar.innerHTML = '';
+            }
+
+            // Filter events
+            let filtered = timelineEvents.map((ev, i) => ({ ...ev, _idx: i }));
+            if (activeTagFilters.length > 0) {
+                filtered = filtered.filter(ev => {
+                    const evTags = ev.tags || [];
+                    return activeTagFilters.some(ft => evTags.includes(ft));
+                });
+            }
+            if (searchQuery) {
+                const q = searchQuery.toLowerCase();
+                filtered = filtered.filter(ev =>
+                    ev.title.toLowerCase().includes(q) ||
+                    (ev.description || '').toLowerCase().includes(q) ||
+                    (ev.tags || []).some(t => t.toLowerCase().includes(q))
+                );
+            }
+
+            // Update result indicator
+            if (searchQuery || activeTagFilters.length > 0) {
+                resultIndicator.innerHTML = `<mark>${filtered.length}/${timelineEvents.length}</mark> 条`;
+            } else {
+                resultIndicator.innerHTML = '';
+            }
+
+            if (!filtered.length) {
+                container.innerHTML = '<div class="empty-state">暂无匹配的时间轴事件。</div>';
+                return;
+            }
+            const sorted = filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
+            container.innerHTML = sorted.map((ev, idx) => {
+                const tagBadges = renderTagBadges(ev.tags || []);
+                const titleHtml = searchQuery ? highlightMatches(ev.title, searchQuery) : esc(ev.title);
+                const descHtml = searchQuery ? highlightMatches(ev.description || '', searchQuery) : esc(ev.description || '');
+                return `
+                <div class="timeline-event" style="animation-delay: ${Math.min(idx, 8) * 0.06}s">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-card">
+                        <div class="timeline-actions">
+                            <button class="btn btn-text btn-sm" onclick="editEvent(${ev._idx})" title="编辑">✏️</button>
+                            <button class="btn btn-text btn-sm" onclick="deleteEvent(${ev._idx})" title="删除">🗑️</button>
+                        </div>
+                        <div class="timeline-date">📅 ${ev.date}</div>
+                        <div class="timeline-title">${titleHtml}</div>
+                        <div class="timeline-desc">${descHtml}</div>
+                        ${tagBadges ? `<div style="margin-top:8px">${tagBadges}</div>` : ''}
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        function openEventModal() {
+            document.getElementById('eventModalTitle').textContent = '添加时间轴事件';
+            document.getElementById('eventEditIndex').value = -1;
+            document.getElementById('evtDate').value = new Date().toISOString().split('T')[0];
+            document.getElementById('evtTitle').value = '';
+            document.getElementById('evtDesc').value = '';
+            document.getElementById('evtTagPicker').innerHTML = renderTagChips([], 'evt-chip');
+            openModal('eventModal');
+        }
+
+        function editEvent(index) {
+            const ev = timelineEvents[index];
+            document.getElementById('eventModalTitle').textContent = '编辑时间轴事件';
+            document.getElementById('eventEditIndex').value = index;
+            document.getElementById('evtDate').value = ev.date;
+            document.getElementById('evtTitle').value = ev.title;
+            document.getElementById('evtDesc').value = ev.description;
+            document.getElementById('evtTagPicker').innerHTML = renderTagChips(ev.tags || [], 'evt-chip');
+            openModal('eventModal');
+        }
+
+        function saveEvent() {
+            const date = document.getElementById('evtDate').value;
+            const title = document.getElementById('evtTitle').value.trim();
+            const desc = document.getElementById('evtDesc').value.trim();
+            const idx = parseInt(document.getElementById('eventEditIndex').value);
+            const tags = getSelectedTagsFromChips(document.getElementById('evtTagPicker'));
+            if (!date || !title) { alert('请填写日期和标题'); return; }
+            if (idx >= 0) {
+                timelineEvents[idx] = { date, title, description: desc, tags };
+            } else {
+                timelineEvents.push({ date, title, description: desc, tags });
+            }
+            persist();
+            renderTimeline();
+            updateStats();
+            recordTickerEntry(`[时间轴] ${date} ${title}${desc ? ' - ' + desc.substring(0, 80) : ''}`);
+            closeModal('eventModal');
+        }
+
+        function deleteEvent(index) {
+            if (!confirm('确定要删除这个时间轴事件吗？')) return;
+            timelineEvents.splice(index, 1);
+            persist();
+            renderTimeline();
+            updateStats();
+        }
+
+        // ==================== Achievements ====================
+        function parseYearSegments(text) {
+            if (!text) return [];
+            const lines = text.split('\n').filter(l => l.trim());
+            const segments = [];
+            let currentYear = null;
+            let currentLabel = '';
+            let currentText = [];
+            let currentTags = [];
+            const TAG_REGEX = /\[#([^\]]+)\]/g;
+
+            // Patterns: optional [#tag] groups between date and separator
+            const patterns = [
+                { regex: /^(\d{4})年(\d{1,2})月[份]?(?:\s*\[#[^\]]+\])*\s*[：:,，]\s*/, hasYear: true, hasMonth: true },
+                { regex: /^(\d{4})[\/\-](\d{1,2})(?:\s*\[#[^\]]+\])*\s*[：:,，]\s*/, hasYear: true, hasMonth: true },
+                { regex: /^(\d{4})年(?:\s*\[#[^\]]+\])*\s*[：:,，]\s*/, hasYear: true, hasMonth: false },
+                { regex: /^同年\s*(\d{1,2})月[份]?(?:\s*\[#[^\]]+\])*\s*[：:,，]\s*/, hasYear: false, hasMonth: true },
+                { regex: /^同年(?:\s*\[#[^\]]+\])*\s*[：:,，]\s*/, hasYear: false, hasMonth: false },
+            ];
+
+            function extractTags(str) {
+                const tags = [];
+                let m;
+                TAG_REGEX.lastIndex = 0;
+                while ((m = TAG_REGEX.exec(str)) !== null) {
+                    tags.push(m[1]);
+                }
+                const clean = str.replace(TAG_REGEX, '').trim().replace(/\s+/g, ' ');
+                return { tags, clean };
+            }
+
+            for (let line of lines) {
+                let matched = false;
+                for (let p of patterns) {
+                    const m = line.match(p.regex);
+                    if (m) {
+                        let year = p.hasYear ? m[1] : currentYear;
+                        let month = p.hasMonth ? (p.hasYear ? m[2] : m[1]) : null;
+                        if (!year) year = currentYear || '未知时间';
+
+                        if (currentLabel) {
+                            segments.push({ label: currentLabel, text: currentText.join('\n'), tags: currentTags });
+                        }
+
+                        currentYear = year;
+                        currentLabel = month ? `${year}年${month}月` : `${year}年`;
+
+                        // Extract tags from the matched portion (between date and separator)
+                        const matchedTags = [];
+                        let tm;
+                        TAG_REGEX.lastIndex = 0;
+                        while ((tm = TAG_REGEX.exec(m[0])) !== null) {
+                            matchedTags.push(tm[1]);
+                        }
+
+                        // Extract tags from remaining text (after separator)
+                        const rawText = line.substring(m[0].length).trim();
+                        const result = extractTags(rawText);
+
+                        // Combine tags
+                        currentTags = [...matchedTags, ...result.tags];
+                        currentText = [result.clean];
+                        matched = true;
+                        break;
+                    }
+                }
+                if (!matched) {
+                    currentText.push(line.trim());
+                }
+            }
+
+            if (currentLabel) {
+                segments.push({ label: currentLabel, text: currentText.join('\n'), tags: currentTags });
+            }
+            if (!segments.length && text.trim()) {
+                const result = extractTags(text.trim());
+                return [{ label: '成就', text: result.clean, tags: result.tags }];
+            }
+            return segments;
+        }
+
+        function groupSegmentsByYear(segments) {
+            const groups = [];
+            let currentGroup = null;
+            for (const seg of segments) {
+                const yearMatch = seg.label.match(/^(\d{4})年/);
+                const year = yearMatch ? yearMatch[1] + '年' : '其他';
+                if (!currentGroup || currentGroup.year !== year) {
+                    currentGroup = { year, segments: [] };
+                    groups.push(currentGroup);
+                }
+                currentGroup.segments.push(seg);
+            }
+            return groups;
+        }
+
+        function renderAchievements() {
+            const container = document.getElementById('achievements-container');
+            const filterBar = document.getElementById('achievements-tag-filter');
+            const resultIndicator = document.getElementById('achievements-result-indicator');
+
+            if (viewMode === 'comparison') {
+                renderComparisonView();
+                return;
+            }
+
+            // Render tag filter bar
+            if (achievements.length > 0) {
+                filterBar.innerHTML = `
+                    <span class="tag-filter-label">🏷️ 筛选：</span>
+                    ${renderTagChips(activeTagFilters, 'ach-chip')}
+                    ${activeTagFilters.length > 0 ? `<span class="tag-clear-filter" onclick="clearTagFilters()">✕ 清除筛选</span>` : ''}
+                `;
+                filterBar.querySelectorAll('.ach-chip').forEach(chip => {
+                    chip.addEventListener('click', function() {
+                        applyTagFilters();
+                    });
+                });
+            } else {
+                filterBar.innerHTML = '';
+            }
+
+            // Helper: does a segment match the search query?
+            function segMatchesSearch(s, q) {
+                if (s.text.toLowerCase().includes(q)) return true;
+                if ((s.tags || []).some(t => t.toLowerCase().includes(q))) return true;
+                return false;
+            }
+            // Helper: does a segment match active tag filters?
+            function segMatchesTags(s) {
+                return activeTagFilters.some(ft => (s.tags || []).includes(ft));
+            }
+
+            // Filter achievements (by segment-level tags and search)
+            let filtered = achievements.map((a, i) => ({ ...a, _idx: i }));
+            if (activeTagFilters.length > 0) {
+                filtered = filtered.filter(a => {
+                    const segs = parseYearSegments(a.achievementDescription);
+                    return segs.some(s => segMatchesTags(s));
+                });
+            }
+            if (searchQuery) {
+                const q = searchQuery.toLowerCase();
+                filtered = filtered.filter(a => {
+                    if (a.companyName.toLowerCase().includes(q)) return true;
+                    const segs = parseYearSegments(a.achievementDescription);
+                    return segs.some(s => segMatchesSearch(s, q));
+                });
+            }
+
+            // Update result indicator
+            if (searchQuery || activeTagFilters.length > 0) {
+                resultIndicator.innerHTML = `<mark>${filtered.length}/${achievements.length}</mark> 条`;
+            } else {
+                resultIndicator.innerHTML = '';
+            }
+
+            if (!filtered.length) {
+                container.innerHTML = '<div class="empty-state">暂无匹配的公司成就数据。</div>';
+                return;
+            }
+            container.innerHTML = filtered.map((a, compIdx) => {
+                const realIdx = a._idx;
+                const logoUrl = getLogoUrl(a);
+                const initials = a.companyName.split(/\s+/).map(w => w[0]).join('').substring(0, 2).toUpperCase();
+                const segments = parseYearSegments(a.achievementDescription);
+                const groups = groupSegmentsByYear(segments);
+                const nameHtml = searchQuery ? highlightMatches(a.companyName, searchQuery) : esc(a.companyName);
+                let globalSegIdx = 0;
+                return `
+                <div class="company-card" data-company="${realIdx}">
+                    <div class="company-header">
+                        <div class="company-header-left">
+                            <div class="company-avatar">${logoUrl ? `<img src="${esc(logoUrl)}" alt="">` : initials}</div>
+                            <div class="company-name">${nameHtml}</div>
+                            ${a.websiteUrl ? `<a class="company-link" href="${esc(a.websiteUrl)}" target="_blank" rel="noopener" title="打开 ${esc(a.companyName)}">🔗</a>` : ''}
+                        </div>
+                        <div class="company-actions">
+                            <button class="btn btn-text btn-sm" onclick="editCompany(${realIdx})" title="编辑">✏️</button>
+                            <button class="btn btn-text btn-sm" onclick="deleteCompany(${realIdx})" title="删除">🗑️</button>
+                        </div>
+                    </div>
+                    <div class="company-toolbar">
+                        <button class="btn btn-secondary btn-sm" onclick="toggleCompanyAll(${realIdx}, true)">展开全部</button>
+                        <button class="btn btn-secondary btn-sm" onclick="toggleCompanyAll(${realIdx}, false)">折叠全部</button>
+                    </div>
+                    <div class="year-list">
+                        ${groups.map((g, gIdx) => `
+                            <div class="year-group ${(gIdx === 0 || (activeTagFilters.length > 0 && g.segments.some(s => segMatchesTags(s))) || (searchQuery && g.segments.some(s => segMatchesSearch(s, searchQuery.toLowerCase())))) ? 'open' : ''}" data-group="${gIdx}">
+                                <div class="year-group-header" onclick="toggleYearGroup(this)">
+                                    <div class="year-group-header-left">
+                                        <span class="year-group-chevron">▶</span>
+                                        <span class="year-group-label">${esc(g.year)}</span>
+                                    </div>
+                                    <span class="year-group-count">${g.segments.length} 条记录</span>
+                                </div>
+                                <div class="year-group-body">
+                                    <div class="year-list-inner">
+                                        ${g.segments.map((s) => {
+                                            const idx = globalSegIdx++;
+                                            const segTags = s.tags || [];
+                                            const segTagBadges = renderTagBadges(segTags);
+                                            const previewHtml = searchQuery ? highlightMatches(s.text.substring(0, 90), searchQuery) : esc(s.text.substring(0, 90));
+                                            const textHtml = searchQuery ? highlightMatches(s.text, searchQuery).replace(/\n/g, '<br>') : esc(s.text).replace(/\n/g, '<br>');
+                                            return `
+                                            <div class="year-item ${((activeTagFilters.length > 0 && segMatchesTags(s)) || (searchQuery && segMatchesSearch(s, searchQuery.toLowerCase()))) ? 'open' : ''}" data-seg="${idx}">
+                                                <div class="year-header" onclick="toggleYear(this)">
+                                                    <div class="year-header-left">
+                                                        <span class="year-chevron">▶</span>
+                                                        <span class="year-label">${esc(s.label)}</span>
+                                                        ${segTagBadges}
+                                                        <span class="year-preview">${previewHtml}${s.text.length > 90 ? '...' : ''}</span>
+                                                    </div>
+                                                    <div class="year-actions" onclick="event.stopPropagation()">
+                                                        <button class="btn btn-text btn-sm" onclick="editCompanyYear(${realIdx}, ${idx})" title="编辑该段">✏️</button>
+                                                        <button class="btn btn-text btn-sm" onclick="deleteCompanyYear(${realIdx}, ${idx})" title="删除该段">🗑️</button>
+                                                    </div>
+                                                </div>
+                                                <div class="year-body">
+                                                    <div class="year-text">${textHtml}</div>
+                                                </div>
+                                            </div>`;
+                                        }).join('')}
+                                    </div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        function toggleYear(header) {
+            const item = header.closest('.year-item');
+            item.classList.toggle('open');
+        }
+
+        function toggleYearGroup(header) {
+            const group = header.closest('.year-group');
+            group.classList.toggle('open');
+        }
+
+        function toggleCompanyAll(compIdx, open) {
+            const card = document.querySelector(`.company-card[data-company="${compIdx}"]`);
+            if (!card) return;
+            card.querySelectorAll('.year-group').forEach(g => {
+                if (open) g.classList.add('open');
+                else g.classList.remove('open');
+            });
+            card.querySelectorAll('.year-item').forEach(item => {
+                if (open) item.classList.add('open');
+                else item.classList.remove('open');
+            });
+        }
+
+        // ==================== Comparison ====================
+        let viewMode = 'normal';
+        let currentComparisonLabel = '';
+
+        function switchToComparison() {
+            viewMode = 'comparison';
+            document.getElementById('achievements-container').classList.remove('achievement-grid');
+            document.getElementById('achievements-tag-filter').innerHTML = '';
+            document.getElementById('achievements-result-indicator').innerHTML = '';
+            const header = document.getElementById('achievements-header');
+            header.innerHTML = `
+                <div>
+                    <h2><span class="badge badge-purple">Compare</span> 同期比较</h2>
+                    <p>横向对比各公司在同一时间节点的成就</p>
+                </div>
+                <button class="btn btn-secondary btn-sm" onclick="switchToNormal()">← 返回列表</button>
+            `;
+            renderComparisonView();
+        }
+
+        function switchToNormal() {
+            viewMode = 'normal';
+            document.getElementById('achievements-container').classList.add('achievement-grid');
+            const header = document.getElementById('achievements-header');
+            header.innerHTML = `
+                <div>
+                    <h2><span class="badge badge-purple">Achievements</span> 公司成就 <span id="achievements-result-indicator" class="result-indicator"></span></h2>
+                    <p>各大公司与研究机构在AI领域的重大突破</p>
+                </div>
+                <div class="btn-group">
+                    <button class="btn btn-primary btn-sm" onclick="openCompanyModal()">➕ 添加公司</button>
+                    <button class="btn btn-secondary btn-sm" onclick="switchToComparison()">📊 同期比较</button>
+                </div>
+            `;
+            renderAchievements();
+        }
+
+        function collectAllTimeLabels() {
+            const labels = new Set();
+            // respect filters (segment-level tags)
+            let src = achievements;
+            if (activeTagFilters.length > 0) {
+                src = src.filter(a => {
+                    const segs = parseYearSegments(a.achievementDescription);
+                    return segs.some(s => activeTagFilters.some(ft => (s.tags || []).includes(ft)));
+                });
+            }
+            if (searchQuery) {
+                const q = searchQuery.toLowerCase();
+                src = src.filter(a => {
+                    if (a.companyName.toLowerCase().includes(q)) return true;
+                    const segs = parseYearSegments(a.achievementDescription);
+                    return segs.some(s => s.text.toLowerCase().includes(q) || (s.tags || []).some(t => t.toLowerCase().includes(q)));
+                });
+            }
+            src.forEach(a => {
+                const segments = parseYearSegments(a.achievementDescription);
+                segments.forEach(s => labels.add(s.label));
+            });
+            return Array.from(labels).sort((a, b) => {
+                const yearA = parseInt(a.match(/^(\d{4})/)?.[1] || '0');
+                const yearB = parseInt(b.match(/^(\d{4})/)?.[1] || '0');
+                if (yearA !== yearB) return yearA - yearB;
+                const monthA = parseInt(a.match(/(\d{1,2})月/)?.[1] || '0');
+                const monthB = parseInt(b.match(/(\d{1,2})月/)?.[1] || '0');
+                return monthA - monthB;
+            });
+        }
+
+        function renderComparisonView() {
+            const container = document.getElementById('achievements-container');
+            const labels = collectAllTimeLabels();
+            if (labels.length === 0) {
+                container.innerHTML = '<div class="empty-state">暂无可比较的时间数据</div>';
+                return;
+            }
+            if (!currentComparisonLabel || !labels.includes(currentComparisonLabel)) {
+                currentComparisonLabel = labels[labels.length - 1];
+            }
+            renderComparisonForLabel(currentComparisonLabel);
+        }
+
+        function renderComparisonForLabel(label) {
+            currentComparisonLabel = label;
+            const container = document.getElementById('achievements-container');
+            const labels = collectAllTimeLabels();
+
+            // Filter achievements (segment-level tags)
+            let filtered = achievements;
+            if (activeTagFilters.length > 0) {
+                filtered = filtered.filter(a => {
+                    const segs = parseYearSegments(a.achievementDescription);
+                    return segs.some(s => activeTagFilters.some(ft => (s.tags || []).includes(ft)));
+                });
+            }
+            if (searchQuery) {
+                const q = searchQuery.toLowerCase();
+                filtered = filtered.filter(a => {
+                    if (a.companyName.toLowerCase().includes(q)) return true;
+                    const segs = parseYearSegments(a.achievementDescription);
+                    return segs.some(s => s.text.toLowerCase().includes(q) || (s.tags || []).some(t => t.toLowerCase().includes(q)));
+                });
+            }
+
+            const tabsHtml = `
+                <div class="comparison-tabs">
+                    ${labels.map(l => `
+                        <button class="comparison-tab ${l === label ? 'active' : ''}" onclick="renderComparisonForLabel('${l.replace(/'/g, "\\'")}')">${esc(l)}</button>
+                    `).join('')}
+                </div>
+            `;
+
+            const cardsHtml = filtered.map(a => {
+                const segments = parseYearSegments(a.achievementDescription);
+                const seg = segments.find(s => s.label === label);
+                const logoUrl = getLogoUrl(a);
+                const initials = a.companyName.split(/\s+/).map(w => w[0]).join('').substring(0, 2).toUpperCase();
+                const segTags = seg ? renderTagBadges(seg.tags || []) : '';
+                const nameHtml = searchQuery ? highlightMatches(a.companyName, searchQuery) : esc(a.companyName);
+
+                let bodyHtml;
+                if (seg) {
+                    bodyHtml = searchQuery ? highlightMatches(seg.text, searchQuery).replace(/\n/g, '<br>') : esc(seg.text).replace(/\n/g, '<br>');
+                } else {
+                    bodyHtml = '<div class="comparison-empty">该时间点无记录</div>';
+                }
+
+                return `
+                    <div class="comparison-card">
+                        <div class="comparison-card-header">
+                            <div class="comparison-card-avatar">${logoUrl ? `<img src="${esc(logoUrl)}" alt="">` : initials}</div>
+                            <div class="comparison-card-name">${nameHtml}</div>
+                            ${segTags ? `<div style="margin-left:auto">${segTags}</div>` : ''}
+                        </div>
+                        <div class="comparison-card-body">
+                            ${bodyHtml}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            container.innerHTML = tabsHtml + `<div class="comparison-grid">${cardsHtml}</div>`;
+        }
+
+        function openCompanyModal() {
+            document.getElementById('companyModalTitle').textContent = '添加公司成就';
+            document.getElementById('companyEditIndex').value = -1;
+            document.getElementById('compName').value = '';
+            document.getElementById('compDesc').value = '';
+            document.getElementById('compLogo').value = '';
+            document.getElementById('compWebsite').value = '';
+            openModal('companyModal');
+        }
+
+        function editCompany(index) {
+            const a = achievements[index];
+            document.getElementById('companyModalTitle').textContent = '编辑公司成就';
+            document.getElementById('companyEditIndex').value = index;
+            document.getElementById('compName').value = a.companyName;
+            document.getElementById('compDesc').value = a.achievementDescription;
+            document.getElementById('compLogo').value = a.logoUrl || '';
+            document.getElementById('compWebsite').value = a.websiteUrl || '';
+            openModal('companyModal');
+        }
+
+        function saveCompany() {
+            const name = document.getElementById('compName').value.trim();
+            const desc = document.getElementById('compDesc').value;
+            const logo = document.getElementById('compLogo').value.trim();
+            const website = document.getElementById('compWebsite').value.trim();
+            const idx = parseInt(document.getElementById('companyEditIndex').value);
+            if (!name) { alert('请填写公司名称'); return; }
+            const entry = { companyName: name, achievementDescription: desc };
+            if (logo) entry.logoUrl = logo;
+            if (website) entry.websiteUrl = website;
+            if (idx >= 0) {
+                achievements[idx] = entry;
+            } else {
+                achievements.push(entry);
+            }
+            persist();
+            renderAchievements();
+            updateStats();
+            recordTickerEntry(`[公司成就] ${name}：${desc ? desc.substring(0, 640).replace(/\n/g, ' | ') : ''}`);
+            closeModal('companyModal');
+        }
+
+        function deleteCompany(index) {
+            if (!confirm(`确定要删除「${achievements[index].companyName}」的所有成就记录吗？`)) return;
+            achievements.splice(index, 1);
+            persist();
+            renderAchievements();
+            updateStats();
+        }
+
+        function editCompanyYear(compIdx, segIdx) {
+            const segments = parseYearSegments(achievements[compIdx].achievementDescription);
+            const seg = segments[segIdx];
+            if (!seg) return;
+            document.getElementById('segmentModalTitle').textContent = '编辑段落';
+            document.getElementById('segmentCompIdx').value = compIdx;
+            document.getElementById('segmentSegIdx').value = segIdx;
+            document.getElementById('segmentLabel').value = seg.label;
+            document.getElementById('segmentText').value = seg.text;
+            document.getElementById('segTagPicker').innerHTML = renderTagChips(seg.tags || [], 'seg-chip');
+            openModal('segmentModal');
+        }
+
+        function saveSegment() {
+            const compIdx = parseInt(document.getElementById('segmentCompIdx').value);
+            const segIdx = parseInt(document.getElementById('segmentSegIdx').value);
+            const newText = document.getElementById('segmentText').value;
+            const tags = getSelectedTagsFromChips(document.getElementById('segTagPicker'));
+            const segments = parseYearSegments(achievements[compIdx].achievementDescription);
+            segments[segIdx].text = newText;
+            segments[segIdx].tags = tags;
+            const rebuilt = segments.map(s => {
+                const tagPrefix = (s.tags && s.tags.length) ? ' ' + s.tags.map(t => `[#${t}]`).join(' ') : '';
+                return `${s.label}${tagPrefix}：${s.text}`;
+            }).join('\n');
+            achievements[compIdx].achievementDescription = rebuilt;
+            persist();
+            renderAchievements();
+            const companyName = achievements[compIdx].companyName;
+            recordTickerEntry(`[公司成就] ${companyName} - ${segments[segIdx].label}：${newText ? newText.substring(0, 640) : ''}`);
+            closeModal('segmentModal');
+        }
+
+        function deleteCompanyYear(compIdx, segIdx) {
+            const segments = parseYearSegments(achievements[compIdx].achievementDescription);
+            if (!confirm(`确定要删除「${segments[segIdx].label}」这一段内容吗？`)) return;
+            segments.splice(segIdx, 1);
+            const rebuilt = segments.map(s => {
+                const tagPrefix = (s.tags && s.tags.length) ? ' ' + s.tags.map(t => `[#${t}]`).join(' ') : '';
+                return `${s.label}${tagPrefix}：${s.text}`;
+            }).join('\n');
+            achievements[compIdx].achievementDescription = rebuilt;
+            persist();
+            renderAchievements();
+        }
+
+        // ==================== Stats ====================
+        function updateStats() {
+            document.getElementById('stat-events').textContent = timelineEvents.length;
+            document.getElementById('stat-companies').textContent = achievements.length;
+            let years = new Set();
+            timelineEvents.forEach(e => {
+                const d = new Date(e.date);
+                if (!isNaN(d)) years.add(d.getFullYear());
+            });
+            achievements.forEach(a => {
+                const matches = a.achievementDescription.match(/(\d{4})年/g);
+                if (matches) matches.forEach(m => years.add(parseInt(m)));
+            });
+            document.getElementById('stat-years').textContent = years.size;
+        }
+
+        // ==================== Import / Export ====================
+        function exportData() {
+            const data = {
+                siteDescription: localStorage.getItem('siteDescription') || '',
+                timelineEvents: JSON.stringify(timelineEvents),
+                achievements: JSON.stringify(achievements)
+            };
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'local_storage_data.json';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function importData(input) {
+            const file = input.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = e => {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    if (data.timelineEvents) {
+                        timelineEvents = JSON.parse(data.timelineEvents);
+                        localStorage.setItem('timelineEvents', data.timelineEvents);
+                    }
+                    if (data.achievements) {
+                        achievements = JSON.parse(data.achievements);
+                        localStorage.setItem('achievements', data.achievements);
+                    }
+                    if (data.siteDescription !== undefined) {
+                        localStorage.setItem('siteDescription', data.siteDescription);
+                    }
+                    renderTimeline();
+                    renderAchievements();
+                    updateStats();
+                    renderNewsTicker();
+                    alert('数据导入成功！');
+                } catch (err) {
+                    alert('文件解析失败，请确保是有效的 JSON 格式。');
+                    console.error(err);
+                }
+                input.value = '';
+            };
+            reader.readAsText(file);
+        }
+
+        function clearAllData() {
+            if (!confirm('确定要清空所有本地数据吗？此操作不可恢复，请确保已导出备份。')) return;
+            localStorage.removeItem('timelineEvents');
+            localStorage.removeItem('achievements');
+            localStorage.removeItem('siteDescription');
+            localStorage.removeItem('lastTickerText');
+            timelineEvents = [];
+            achievements = [];
+            renderTimeline();
+            renderAchievements();
+            updateStats();
+            renderNewsTicker();
+            alert('本地数据已清空。你可以重新导入 JSON 文件。');
+        }
+
+        // ==================== Modal Utils ====================
+        function openModal(id) {
+            document.getElementById(id).classList.add('active');
+        }
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('active');
+        }
+        // Close on backdrop click
+        ['eventModal', 'companyModal', 'segmentModal'].forEach(id => {
+            document.getElementById(id).addEventListener('click', e => {
+                if (e.target.id === id) closeModal(id);
+            });
+        });
+
+        // ==================== Utilities ====================
+        function esc(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // ==================== Background Canvas Animation ====================
+        (function() {
+            const canvas = document.getElementById('bgCanvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            let W, H;
+            function resize() {
+                W = canvas.width = window.innerWidth;
+                H = canvas.height = window.innerHeight;
+            }
+            window.addEventListener('resize', resize);
+            resize();
+
+            const chars = '0123456789ABCDEF<>/\\{}[]|;:+=-*&%$#@!?~';
+            const kana = 'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン';
+            const hex = '01';
+
+            // 横向数据流
+            class HStream {
+                constructor(layer) {
+                    this.layer = layer;
+                    this.reset();
+                }
+                reset() {
+                    this.x = -300 - Math.random() * 800;
+                    this.y = Math.random() * H;
+                    this.speed = (0.3 + Math.random() * 1.5) * (this.layer === 0 ? 0.5 : 1.5);
+                    this.len = 20 + Math.floor(Math.random() * 50);
+                    this.size = this.layer === 0 ? 14 + Math.random() * 8 : 8 + Math.random() * 4;
+                    this.opacity = this.layer === 0 ? 0.04 + Math.random() * 0.06 : 0.08 + Math.random() * 0.12;
+                    this.blur = this.layer === 0;
+                    this.chars = this.layer === 0 ? hex : chars;
+                    this.text = Array.from({length: this.len}, () => this.chars[Math.floor(Math.random() * this.chars.length)]).join('');
+                    this.switchTimer = 0;
+                }
+                update() {
+                    this.x += this.speed;
+                    this.switchTimer++;
+                    if (this.switchTimer > 10) {
+                        this.text = Array.from({length: this.len}, () => this.chars[Math.floor(Math.random() * this.chars.length)]).join('');
+                        this.switchTimer = 0;
+                    }
+                    if (this.x > W + this.len * this.size) this.reset();
+                }
+                draw() {
+                    ctx.save();
+                    ctx.globalAlpha = this.opacity;
+                    if (this.blur) ctx.filter = 'blur(2px)';
+                    ctx.font = `${this.size}px "Share Tech Mono", monospace`;
+                    ctx.fillStyle = this.layer === 0 ? '#8b5cf6' : '#06b6d4';
+                    ctx.fillText(this.text, this.x, this.y);
+                    ctx.restore();
+                }
+            }
+
+            // 漂浮的单字符粒子
+            class Particle {
+                constructor() { this.reset(); }
+                reset() {
+                    this.x = Math.random() * W;
+                    this.y = Math.random() * H;
+                    this.vx = (Math.random() - 0.5) * 0.3;
+                    this.vy = (Math.random() - 0.5) * 0.3;
+                    this.char = chars[Math.floor(Math.random() * chars.length)];
+                    this.size = 8 + Math.random() * 6;
+                    this.alpha = 0.1 + Math.random() * 0.2;
+                    this.color = Math.random() > 0.5 ? '#3b82f6' : '#8b5cf6';
+                    this.life = 100 + Math.random() * 200;
+                    this.maxLife = this.life;
+                }
+                update() {
+                    this.x += this.vx;
+                    this.y += this.vy;
+                    this.life--;
+                    if (this.life <= 0 || this.x < 0 || this.x > W || this.y < 0 || this.y > H) this.reset();
+                }
+                draw() {
+                    const a = this.alpha * (this.life / this.maxLife);
+                    ctx.save();
+                    ctx.globalAlpha = a;
+                    ctx.font = `${this.size}px "Share Tech Mono", monospace`;
+                    ctx.fillStyle = this.color;
+                    ctx.fillText(this.char, this.x, this.y);
+                    ctx.restore();
+                }
+            }
+
+            const hStreamsFar = Array.from({length: 25}, () => new HStream(0));
+            const hStreamsNear = Array.from({length: 35}, () => new HStream(1));
+            const particles = Array.from({length: 60}, () => new Particle());
+
+            function animate() {
+                ctx.fillStyle = 'rgba(11, 15, 25, 0.12)';
+                ctx.fillRect(0, 0, W, H);
+
+                hStreamsFar.forEach(s => { s.update(); s.draw(); });
+                particles.forEach(p => { p.update(); p.draw(); });
+                hStreamsNear.forEach(s => { s.update(); s.draw(); });
+
+                requestAnimationFrame(animate);
+            }
+            animate();
+        })();
+
+        // ==================== Start ====================
+        init();
+    </script>
+</body>
+</html>
