@@ -1026,12 +1026,119 @@
 
         /* Footer */
         footer {
-            text-align: center;
-            padding: 40px 24px;
+            position: relative;
+            overflow: hidden;
             color: var(--text-muted);
             font-size: 0.82rem;
             border-top: 1px solid var(--glass-border);
             margin-top: 20px;
+        }
+        .footer-blur-layer {
+            position: absolute;
+            top: -40%;
+            left: -10%;
+            right: -10%;
+            bottom: -40%;
+            backdrop-filter: blur(var(--footer-blur, 0px));
+            -webkit-backdrop-filter: blur(var(--footer-blur, 0px));
+            pointer-events: none;
+            z-index: 0;
+            mask-image: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.3) 15%, rgba(0,0,0,1) 35%, rgba(0,0,0,1) 65%, rgba(0,0,0,0.3) 85%, rgba(0,0,0,0) 100%);
+            -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.3) 15%, rgba(0,0,0,1) 35%, rgba(0,0,0,1) 65%, rgba(0,0,0,0.3) 85%, rgba(0,0,0,0) 100%);
+            transition: backdrop-filter 0.15s ease-out, -webkit-backdrop-filter 0.15s ease-out;
+        }
+        .footer-contact-section {
+            position: relative;
+            z-index: 1;
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 48px 24px 32px;
+            text-align: center;
+        }
+        .footer-contact-section .section-header {
+            margin-bottom: 28px;
+        }
+        .footer-contact-section .section-header h2 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .footer-contact-section .section-header p {
+            font-size: 0.88rem;
+            color: var(--text-muted);
+        }
+        .footer-contact-form {
+            background: var(--card-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 24px;
+            backdrop-filter: blur(12px);
+            text-align: left;
+        }
+        .footer-contact-form .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+        .footer-contact-form .form-group {
+            margin-bottom: 14px;
+        }
+        .footer-contact-form .form-group:last-child {
+            margin-bottom: 0;
+        }
+        .footer-contact-form label {
+            display: block;
+            font-size: 0.78rem;
+            font-weight: 500;
+            margin-bottom: 5px;
+            color: var(--text-muted);
+        }
+        .footer-contact-form input,
+        .footer-contact-form textarea {
+            width: 100%;
+            padding: 10px 12px;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            color: var(--text);
+            font-size: 0.85rem;
+            font-family: inherit;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .footer-contact-form input:focus,
+        .footer-contact-form textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+        }
+        .footer-contact-form input::placeholder,
+        .footer-contact-form textarea::placeholder {
+            color: rgba(148, 163, 184, 0.4);
+        }
+        .footer-contact-form textarea {
+            resize: vertical;
+            min-height: 90px;
+        }
+        .footer-bottom {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            padding: 20px 24px 40px;
+            border-top: 1px solid var(--glass-border);
+        }
+        .footer-bottom p {
+            margin: 0;
+        }
+        @media (max-width: 768px) {
+            .footer-contact-form .form-row {
+                grid-template-columns: 1fr;
+                gap: 0;
+            }
         }
 
         /* Animations */
@@ -1201,7 +1308,37 @@
     </section>
 
     <footer>
-        <p>© 2024-2025 AI Chronicle. All rights reserved.</p>
+        <div class="footer-blur-layer"></div>
+        <div class="footer-contact-section">
+            <div class="section-header">
+                <h2><span class="badge badge-blue">Contact</span> 联系作者</h2>
+                <p>有任何建议、数据补充或合作意向，欢迎取得联系</p>
+            </div>
+            <div class="footer-contact-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>姓名 / Name</label>
+                        <input type="text" id="contactName" placeholder="您的称呼">
+                    </div>
+                    <div class="form-group">
+                        <label>邮箱 / Email</label>
+                        <input type="email" id="contactEmail" placeholder="your@email.com">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>单位 / Organization</label>
+                    <input type="text" id="contactOrg" placeholder="公司、学校或机构名称">
+                </div>
+                <div class="form-group">
+                    <label>留言 / Message</label>
+                    <textarea id="contactMessage" placeholder="请输入您的留言内容，例如数据纠错、功能建议、合作洽谈..."></textarea>
+                </div>
+                <button class="btn btn-primary" style="width:100%" onclick="submitContact()">📧 发送邮件</button>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>© 2024-2025 AI Chronicle. All rights reserved.</p>
+        </div>
     </footer>
 
     <!-- Event Modal (Add/Edit) -->
@@ -1528,9 +1665,9 @@
         }
 
         // ==================== Init ====================
-        function init() {
-            const lsEvents = localStorage.getItem('timelineEvents');
-            const lsAchieve = localStorage.getItem('achievements');
+        async function init() {
+            let lsEvents = localStorage.getItem('timelineEvents');
+            let lsAchieve = localStorage.getItem('achievements');
 
             if (lsEvents) {
                 try { timelineEvents = JSON.parse(lsEvents); } catch(e) {}
@@ -1542,6 +1679,31 @@
                 try { achievements = JSON.parse(lsAchieve); } catch(e) {}
             } else {
                 achievements = [];
+            }
+
+            // 如果 localStorage 没有数据，自动从 JSON 文件加载
+            if (!lsEvents && !lsAchieve) {
+                try {
+                    const response = await fetch('./local_storage_data.json');
+                    if (response.ok) {
+                        const data = await response.json();
+                        if (data.timelineEvents) {
+                            timelineEvents = JSON.parse(data.timelineEvents);
+                            localStorage.setItem('timelineEvents', data.timelineEvents);
+                            lsEvents = data.timelineEvents;
+                        }
+                        if (data.achievements) {
+                            achievements = JSON.parse(data.achievements);
+                            localStorage.setItem('achievements', data.achievements);
+                            lsAchieve = data.achievements;
+                        }
+                        if (data.siteDescription !== undefined) {
+                            localStorage.setItem('siteDescription', data.siteDescription);
+                        }
+                    }
+                } catch(e) {
+                    console.error('Failed to load local_storage_data.json:', e);
+                }
             }
 
             renderTimeline();
@@ -2403,6 +2565,58 @@
                 requestAnimationFrame(animate);
             }
             animate();
+        })();
+
+        // ==================== Contact ====================
+        function submitContact() {
+            const name = document.getElementById('contactName').value.trim();
+            const email = document.getElementById('contactEmail').value.trim();
+            const org = document.getElementById('contactOrg').value.trim();
+            const message = document.getElementById('contactMessage').value.trim();
+
+            if (!email) {
+                alert('请填写邮箱地址，以便作者回复您。');
+                return;
+            }
+            if (!message) {
+                alert('请填写留言内容。');
+                return;
+            }
+
+            const subject = encodeURIComponent(`[AI Chronicle 联系] ${name || '匿名'}${org ? ' · ' + org : ''}`);
+            const body = encodeURIComponent(
+                `姓名：${name || '未填写'}\n` +
+                `邮箱：${email}\n` +
+                `单位：${org || '未填写'}\n\n` +
+                `留言内容：\n${message}`
+            );
+
+            window.location.href = `mailto:1211800886@qq.com?subject=${subject}&body=${body}`;
+        }
+
+        // ==================== Footer Scroll Blur ====================
+        (function() {
+            const footer = document.querySelector('footer');
+            if (!footer) return;
+
+            function updateFooterBlur() {
+                const rect = footer.getBoundingClientRect();
+                const wh = window.innerHeight;
+
+                // 当 footer 顶部进入视口底部时开始计算模糊
+                if (rect.top < wh && rect.bottom > 0) {
+                    // progress: 0 ~ 1，footer 顶部从视口底部移动到视口中部
+                    const progress = Math.max(0, Math.min(1, 1 - rect.top / wh));
+                    // blur 从 0px 渐变到 18px
+                    const blur = progress * 18;
+                    footer.style.setProperty('--footer-blur', `${blur}px`);
+                } else {
+                    footer.style.setProperty('--footer-blur', '0px');
+                }
+            }
+
+            window.addEventListener('scroll', updateFooterBlur, { passive: true });
+            updateFooterBlur(); // 初始调用
         })();
 
         // ==================== Start ====================
